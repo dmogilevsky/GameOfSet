@@ -1,0 +1,164 @@
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+
+/* Page styling with background color and font*/
+body {
+	height: 800px;
+	font-family: 'Courier New', monospace;
+	background-color: #b30000;
+	background-image: linear-gradient(#b30000, #0086b3);
+}
+
+
+img
+
+/* Card styling */
+	{
+	min-height: 90px;
+	min-width: 170px;
+	width: 100%;
+	height: 100%;
+	padding: 1px;
+	border-radius: 10px;
+	object-fit: cover;
+}
+
+h1
+
+/* Header for game name */
+	{
+	font: italic 60px monospace;
+	font-size: 60px;
+	margin-bottom: 10px;
+	text-align: center;
+	width: 100%;
+	overflow: hidden;
+	text-shadow: 1px 1px 1px #333;
+
+}
+
+.btn
+
+/* Button styling */
+	{
+	color: black;
+	outline: black;
+	padding: 12px 26px;
+	display: flex;
+	transition-duration: .5s;
+	cursor: pointer;
+	background-color: #4CAF50;
+	border: 2px solid black;
+	text-align: center;
+	font-size: 16px;
+	width: 100px;
+	height: 40px;
+}
+
+.btnMenu
+
+/* Button menu */
+	{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	place-items: center;
+	max-width: 200px;
+	max-height: 200px;
+	margin-left: 5px;
+}
+
+.menuHeader
+
+/*Menu header */
+	{
+	margin-left: 85px;
+	margin-right: auto;
+}
+
+.spacing
+
+/*Instruction text spacing */
+	{
+	margin-bottom: -50px;
+}
+
+.shuf
+
+/*Shuffle button centering*/
+	{
+	padding: 10px 22px;
+}
+
+.hint
+
+/*Hint button centering*/
+	{
+	padding: 10px 32px;
+}
+
+.p1
+
+/*Player select buttons */
+	{
+	font-size: 14px;
+	padding: 4px 32px;
+	background-color: #0084ff;
+}
+
+.p2
+
+/*Player select buttons */
+	{
+	font-size: 14px;
+	padding: 4px 32px;
+	background-color: #ff0000;
+}
+
+.fin
+
+/* game end button centering and coloring */
+	{
+	background-color: #92999b;
+	padding: 10px 28px;
+}
+
+.inst
+
+/* instructions button centering and coloring */
+	{
+	background-color: #92999b;
+	padding: 10px 6px;
+}
+
+.grid .select
+
+/* Highlighter */
+	{
+	border: 5px solid #ff0000;
+	border-radius: 10px;
+}
+
+.grid .unselect
+
+/*Removes selected highlight */
+	{
+	border: 5px solid transparent;
+	border-radius: 10px;
+}
+
+
+.grid
+
+/* 12 Card holder grid */
+	{
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	place-items: start end;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 500px;
+	margin-bottom: -240px;
+}

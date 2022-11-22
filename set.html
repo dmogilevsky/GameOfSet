@@ -1,52 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="">
 
 <head>
-    <!-- Header info with style sheet link -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SET Puzzle Game</title>
+    <title>Set</title>
     <link rel="stylesheet" href="setStyle.css">
 </head>
 
 <body>
-     <!-- Game title, Timer, hints, player 1 and 2 scores, player chosen-->
-    <h1 class="title"> Game of Set </h1>
-    <div>Time: <span id="mins">00</span>:<span id="secs">00</span></div>
-    <div>Hint: <span id="hint"></span></div>
-    <div>Player 1 Score: <span id="p1score">0</span></div>
-    <div>Player 2 Score: <span id="p2score">0</span></div>
-    <p id="playerChosen">Select who is currently playing.</p>
-    <script src="SetGameLogic.js" type="text/javascript"></script>
-    <!-- Javascript link to DOMHandler, and SetGameLogic-->
-    <script src="DOMHandler.js" type="text/javascript"></script>
-    <script> window.onload = StartGame; </script>
-    <div class="grid">
-        <div onclick="cardSelected(this);" class=unselect id=A0><img src="images/50.png" id=0></div>
-        <div onclick="cardSelected(this);" class=unselect id=A1><img src="images/2.png" id=1></div>
-        <div onclick="cardSelected(this);" class=unselect id=A2><img src="images/1.png" id=2></div>
-        <div onclick="cardSelected(this);" class=unselect id=A3><img src="images/1.png" id=3></div>
-
-        <div onclick="cardSelected(this);" class=unselect id=A4><img src="images/1.png" id=4></div>
-        <div onclick="cardSelected(this);" class=unselect id=A5><img src="images/1.png" id=5></div>
-        <div onclick="cardSelected(this);" class=unselect id=A6><img src="images/1.png" id=6></div>
-        <div onclick="cardSelected(this);" class=unselect id=A7><img src="images/1.png" id=7></div>
-
-        <div onclick="cardSelected(this);" class=unselect id=A8><img src="images/1.png" id=8></div>
-        <div onclick="cardSelected(this);" class=unselect id=A9><img src="images/1.png" id=9></div>
-        <div onclick="cardSelected(this);" class=unselect id=A10><img src="images/1.png" id=10></div>
-        <div onclick="cardSelected(this);" class=unselect id=A11><img src="images/1.png" id=11></div>
+<script src="SetGameLogic.js" type="text/javascript"></script>
+<script src="DOMHandler.js" type="text/javascript"></script>
+<script> window.onload = StartGame; </script>
+<div width="100%">
+    <div class="row">
+        <nav class="menu js-menu-items-wrapper">
+            <ol class="js-menu-items-list">
+                <li class="menu-item js-menu-item is-active"
+                    data-morph="M 418.1,159.8 C 460.9,222.9 497,321.5 452.4,383.4 417.2,432.4 371.2,405.6 271.3,420.3
+                    137.2,440 90.45,500.6 42.16,442.8 -9.572,381 86.33,289.1 117.7,215.5 144.3,153.4 145.7,54.21 212.7,
+                    36.25 290.3,15.36 373.9,94.6 418.1,159.8 Z">
+                    <a href="#0">Game</a>
+                    <ol class="sub-menu">
+                        <li class="menu-item"><a href="#0" onclick=finish_game();>Finish Game</a></li>
+                        <li class="menu-item"><a href="#0" onclick=StartGame();>Restart</a></li>
+                        <li class="menu-item" onclick="redrawGameBoard()"><a href="#0">Shuffle</a></li>
+                    </ol>
+                </li>
+                <li class="menu-item js-menu-item"
+                    data-morph="M 402.7,215.5 C 433.9,280.4 488.1,367.2 447.7,426.8 410.1,482.2 316.7,460.2 249.7,460.6
+                    182.8,461.1 88.08,485.5 51.26,429.5 10.29,367.3 73.19,279.4 106.9,213 141.8,144 176.6,33.65 253.9,
+                    33.7 332.2,33.75 368.8,144.9 402.7,215.5 Z">
+                    <a href="#0">Help</a>
+                    <ol class="sub-menu">
+                        <li class="menu-item" onclick="toggleInstructions();"><a href="#0">Instructions</a></li>
+                        <li class="menu-item" onclick="hintReveal();"><a href="#0" id="hint">Hint: </a></li>
+                    </ol>
+                </li>
+                <li class="menu-item js-menu-item"
+                    data-morph="M 378.1,121.2 C 408.4,150 417.2,197.9 411,245.8 404.8,293.7 383.5,341.7 353.4,370.7
+                    303.2,419.1 198.7,427.7 144.5,383.8 86.18,336.5 67.13,221.3 111.9,161 138.6,125 188.9,99.62 240.7,
+                    90.92 292.4,82.24 345.6,90.32 378.1,121.2 Z">
+                    <a href="#0">Players</a>
+                    <ol class="sub-menu">
+                        <li class="menu-item"><a id="p1score" href="#0" onclick=changePlayer(1);>Player 1: </a></li>
+                        <li class="menu-item"><a id="p2score" href="#0" onclick="changePlayer(2);">Player 2: </a></li>
+                    </ol>
+                </li>
+            </ol>
+            <div class="menu-shape js-shape">
+                <svg id="circle" viewBox="0 0 500 500">
+                    <defs>
+                        <linearGradient id="main-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="10%" style="stop-color:#6426cb;"/>
+                            <stop offset="100%" style="stop-color:#F34EA4;"/>
+                        </linearGradient>
+                    </defs>
+                    <path id="object" class="js-items-shape-path" fill="url(#main-gradient)"
+                          d="M 418.1,159.8 C 460.9,222.9 497,321.5 452.4,383.4 417.2,432.4 371.2,405.6 271.3,420.3 137.2
+                          ,440 90.45,500.6 42.16,442.8 -9.572,381 86.33,289.1 117.7,215.5 144.3,153.4 145.7,54.21 212.7,
+                          36.25 290.3,15.36 373.9,94.6 418.1,159.8 Z"></path>
+                </svg>
+            </div>
+        </nav>
     </div>
-    <div class="menuHeader">Menu</div> <!-- Menu container for our various buttons-->
-    <div class="btnMenu">
-        <button class="btn shuf" id="Redraw" onclick="redrawGameBoard()">Shuffle</button> <!-- Shuffles board-->
-        <button class="btn hint" id="GiveHint" onclick="hintReveal()">Hint</button> <!-- Hint button-->
-        <button id="playingOne" class="btn p1" onclick="changePlayer(1);">Player One</button> <!-- Select player 1 button-->
-        <button id="playingTwo" class="btn p2" onclick="changePlayer(2);">Player Two</button> <!-- Select player 2 button-->
-        <button onclick="finish_game();" class="btn fin">Finish</button> <!-- Finish game button-->
-        <button onclick="toggleInstructions();" class="btn inst">Instructions</button> <!-- Instructions button-->
-        <button onclick="StartGame();" class="btn">Restart</button> <!-- Restart game button-->
+    <div class="row">
+        <div class="grid">
+            <div onclick="cardSelected(this);" class=unselect id=A0><img id=0 alt="" src=""></div>
+            <div onclick="cardSelected(this);" class=unselect id=A1><img id=1 alt="" src=""></div>
+            <div onclick="cardSelected(this);" class=unselect id=A2><img id=2 alt="" src=""></div>
+            <div onclick="cardSelected(this);" class=unselect id=A3><img id=3 alt="" src=""></div>
+            <div onclick="cardSelected(this);" class=unselect id=A4><img id=4 alt="" src=""></div>
+            <div onclick="cardSelected(this);" class=unselect id=A5><img id=5 alt="" src=""></div>
+            <div onclick="cardSelected(this);" class=unselect id=A6><img id=6 alt="" src=""></div>
+            <div onclick="cardSelected(this);" class=unselect id=A7><img id=7 alt=""></div>
+            <div onclick="cardSelected(this);" class=unselect id=A8><img id=8 alt=""></div>
+            <div onclick="cardSelected(this);" class=unselect id=A9><img id=9 alt=""></div>
+            <div onclick="cardSelected(this);" class=unselect id=A10><img id=10 alt=""></div>
+            <div onclick="cardSelected(this);" class=unselect id=A11><img id=11 alt=""></div>
+        </div>
     </div>
-    <div class="spacing" id="Instructions"></div>
+</div>
 </body>
-
 </html>

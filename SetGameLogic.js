@@ -1,13 +1,13 @@
 // 81 Cards
 //Each card has 4 attributes
+// Green, Red, Purple
+// 1, 2, 3
+// Diamond, Squiggle, Oval
+// Hollow, Striped, Full
 class Card {
-    constructor(id, shade, shape, color, number, selected) {
+    constructor(id, shade, shape, color, number) {
         this.id = id; // 1-81
-        this.color = color; // Green, Red, Purple
-        this.number = number; // 1, 2, 3
-        this.shape = shape; // Diamond, Squiggle, Oval
-        this.shade = shade; // Hollow, Striped, Full
-        this.selected = selected;
+        this.attributes = {"color": color, "number": number, "shape": shape, "shade": shade}
     }
 }
 
@@ -26,24 +26,17 @@ const AttributeMapping = [
     ["Squiggle", "Diamond", "Oval"], // 1. Shape
     ["Red", "Purple", "Green"], // 2. Color
 ];
-let GameBoard; // Holds the 12 visible cards
-let Cards; // Holds every card regardless of deck status
-let Deck;  // The deck of 81 cards
-let potentialSet; //Holds 3 cards that are user-inputted
+
+let GameBoard = []; // Holds the 12 visible cards
+let Cards = []; // Holds every card regardless of deck status
+let Deck = [];  // The deck of 81 cards
+let potentialSet = []; //Holds 3 cards that are user-inputted
 let scores; //Holds user score
-let playerPlaying; // Player currently selecting cards
+let playerPlaying = null; // Player currently selecting cards
 
 // Do all the necessary initialization to start the Set game
 function startGame() {
     // re-initialize global variables as necessary
-    GameBoard = [];
-    potentialSet = [];
-    Cards = [];
-    Deck = [];
-    scores = [0, 0];
-    playerPlaying = null;
-    // Make card attribute mapping
-    console.log("Attribute mapping made");
 
     // Initialize cards and deck
     if (Cards.length !== NumberOfCards || Deck.length !== NumberOfCards) {
@@ -52,8 +45,22 @@ function startGame() {
     }
     unHighlightAll();
     changePlayer(playerPlaying);
-    scoreUpdate();
     createGameBoard();
+    let numPlayers = promptForPlayerNumber();
+    scores = [];
+    for (let i = 0; i < numPlayers; i++) {
+        scores[i] = 0;
+    }
+    scoreUpdate();
+    initializeUI();
+}
+
+function promptForPlayerNumber() {
+    let numPlayers = null;
+    while (numPlayers === null) {
+        numPlayers = parseInt(prompt("Enter the number of players", "0"), 10);
+    }
+    return numPlayers;
 }
 
 // Make an array of all 81 cards
@@ -148,19 +155,32 @@ function updateBoardAfterSet(indexArr) {
 // For each attribute in the set, all cards must be the same or all must be different
 function isSet(x, y, z) {
     // check to ensure non are null
-    if (x === null || y === null || z === null) {
-        return false;
+    let set = true;
+    if (x !== null && y !== null && z !== null) {
+        console.log(x.attributes)
+        for (let key in x.attributes) {
+            console.log(key);
+            if (!allAttributesEqual(x, y, z, key) && !allAttributesDifferent(x, y, z, key)) {
+                set = false;
+            }
+        }
     } else {
-        return (
-                x.color === y.color && y.color === z.color || x.color !== y.color && x.color !== z.color && y.color !== z.color) &&
-            (x.shade === y.shade && y.shade === z.shade || x.shade !== y.shade && x.shade !== z.shade && y.shade !== z.shade) &&
-            (x.number === y.number && y.number === z.number || x.number !== y.number && x.number !== z.number && y.number !== z.number) &&
-            (x.shape === y.shape && y.shape === z.shape || x.shape !== y.shape && x.shape !== z.shape && y.shape !== z.shape
-            );
+        set = false;
     }
+    return set;
+}
+
+function allAttributesEqual(x, y, z, key) {
+    return x.attributes[key] === y.attributes[key] && y.attributes[key] === z.attributes[key]
+}
+
+function allAttributesDifferent(x, y, z, key) {
+    return x.attributes[key] !== y.attributes[key] && x.attributes[key] !== z.attributes[key] &&
+        y.attributes[key] !== z.attributes[key]
 }
 
 // Return the number of sets on the board
+
 function setsOnBoard() {
 
     let numSets = 0;
@@ -212,12 +232,13 @@ function handleSetCheck() {
 
     if (isSet(potentialSet[0], potentialSet[1], potentialSet[2])) {
         scores[playerPlaying - 1]++;
-        updateBoardAfterSet([GameBoard.indexOf(potentialSet[0]), GameBoard.indexOf(potentialSet[1]), GameBoard.indexOf(potentialSet[2])]);
+        updateBoardAfterSet([GameBoard.indexOf(potentialSet[0]), GameBoard.indexOf(potentialSet[1]),
+            GameBoard.indexOf(potentialSet[2])]);
     } else {
         scores[playerPlaying - 1]--;
     }
 
     potentialSet = [];
     scoreUpdate();
-    changePlayer(null);
+    playerPlaying = null;
 }

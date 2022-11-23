@@ -1,6 +1,24 @@
 const SelectClassName = 'select';
 const UnSelectClassName = 'unselect';
 
+function initializeUI() {
+    let players = document.getElementById("players");
+    while (players.lastChild) {
+        players.removeChild(players.lastChild);
+    }
+    for (let i = 1; i <= scores.length; i++) {
+        let newLi = document.createElement("li");
+        newLi.className = "menu-item";
+        let a = document.createElement("a");
+        a.id = "p" + i.toString() + "score";
+        a.href = "#0";
+        a.setAttribute("onclick", "changePlayer(" + i.toString() + ");");
+        a.textContent = "Player " + i.toString() + ": ";
+        newLi.appendChild(a);
+        players.appendChild(newLi)
+    }
+}
+
 // Write this function to update the DOM elements to match our GameBoard
 function syncModelAndUIGameBoard() {
     console.log("Syncing GameBoard with UI");

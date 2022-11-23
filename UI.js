@@ -1,4 +1,4 @@
-import TweenMax from "./node_modules/gsap";
+import TweenMax from "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.4.0/gsap.min.js";
 
 function hoverAnimation() {
     const menuItemsShape = $(".js-shape"), linksWrapper = $(".js-menu-items-wrapper"), linksItems = $(".js-menu-item"),

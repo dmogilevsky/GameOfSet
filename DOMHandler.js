@@ -112,17 +112,25 @@ function finishGame() {
 
     scoreUpdate();
     syncModelAndUIGameBoard();
-    let p_win = 0;
-    if (scores[0] > scores[1]) {
-        p_win = 1;
-    } else if (scores[0] < scores[1]) {
-        p_win = 2;
+    let winningPlayers = [];
+    let maxScore = Math.max(...scores);
+    for (let i = 0; i < scores.length; i++) {
+        if (scores[i] === maxScore) {
+            winningPlayers.push(i + 1);
+        }
     }
 
-    if (p_win === 0) {
-        alert("Game Over!\n Its a draw!");
+    if (winningPlayers.length === scores.length) {
+        alert("Game Over!\n All players draw with a score of " + maxScore);
+    } else if (winningPlayers.length > 1) {
+        let alertString = "Game Over!\n Players ";
+        for (let i = 1; i < winningPlayers.length; i++) {
+            alertString += i.toString() + ", ";
+        }
+        alertString += winningPlayers.length.toString() + " tie with the score: " + maxScore + "!";
+        alert(alertString);
     } else {
-        alert("Game Over!\n Player " + p_win + " wins the game with the score: " + scores[p_win - 1] + "!");
+        alert("Game Over!\n Player " + winningPlayers[0] + " wins the game with the score: " + maxScore + "!");
     }
 
 }

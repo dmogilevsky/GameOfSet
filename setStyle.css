@@ -70,9 +70,8 @@ img
     grid-template-columns: repeat(4, 1fr);
     place-items: start end;
     margin-left: auto;
-    margin-right: auto;
-    max-width: 500px;
-    margin-bottom: -240px;
+    margin-right: 5%;
+    max-width: 60%;
 }
 
 
@@ -83,7 +82,6 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    display: flex;
     align-items: center;
     justify-content: center;
     background-color: #000;

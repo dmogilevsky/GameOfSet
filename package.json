@@ -1,0 +1,7 @@
+{
+  "name": "GameOfSet",
+  "version": "1.0.0",
+  "dependencies": {
+    "gsap": "^3.11.3"
+  }
+}

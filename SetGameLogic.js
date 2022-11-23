@@ -1,17 +1,31 @@
 // 81 Cards
 //Each card has 4 attributes
 class Card {
-    constructor(id, shade, shape, color, number) {
+    constructor(id, shade, shape, color, number, selected) {
         this.id = id; // 1-81
         this.color = color; // Green, Red, Purple
         this.number = number; // 1, 2, 3
         this.shape = shape; // Diamond, Squiggle, Oval
         this.shade = shade; // Hollow, Striped, Full
+        this.selected = selected;
     }
 }
 
 const NumberOfCards = 81;
 const CardsOnBoard = 12;
+const CardsInSet = 3;
+
+/* Cards are ordered by:
+   Shade: Bold, Striped, Hollow
+       Shape: Squiggle, Diamond, Oval
+           Color: Red, Purple, Green
+             Number: 1, 2, 3
+Make mapping for shade, shape, color relative to card order */
+const AttributeMapping = [
+    ["Bold", "Striped", "Hollow"], // 0. Shade
+    ["Squiggle", "Diamond", "Oval"], // 1. Shape
+    ["Red", "Purple", "Green"], // 2. Color
+];
 let GameBoard; // Holds the 12 visible cards
 let Cards; // Holds every card regardless of deck status
 let Deck;  // The deck of 81 cards
@@ -20,13 +34,15 @@ let scores; //Holds user score
 let playerPlaying; // Player currently selecting cards
 
 // Do all the necessary initialization to start the Set game
-function StartGame() {
+function startGame() {
     // re-initialize global variables as necessary
-    GameBoard = [], potentialSet = [], Cards = [], Deck = [];
+    GameBoard = [];
+    potentialSet = [];
+    Cards = [];
+    Deck = [];
     scores = [0, 0];
     playerPlaying = null;
     // Make card attribute mapping
-    let AttributeMapping = makeAttributeMappings();
     console.log("Attribute mapping made");
 
     // Initialize cards and deck
@@ -40,20 +56,6 @@ function StartGame() {
     createGameBoard();
 }
 
-/* Cards are ordered by:
-   Shade: Bold, Striped, Hollow
-       Shape: Squiggle, Diamond, Oval
-           Color: Red, Purple, Green
-             Number: 1, 2, 3
-Make mapping for shade, shape, color relative to card order */
-function makeAttributeMappings() {
-    return [
-        ["Bold", "Striped", "Hollow"], // 0. Shade
-        ["Squiggle", "Diamond", "Oval"], // 1. Shape
-        ["Red", "Purple", "Green"], // 2. Color
-    ];
-}
-
 // Make an array of all 81 cards
 function initializeCards(map) {
     Cards = [];
@@ -64,9 +66,9 @@ function initializeCards(map) {
         for (let j = 0; j <= 2; j++) { // The shape of the card, Squiggle, Diamond, Oval
             for (let k = 0; k <= 2; k++) { // The color, Red, Purple, Green
                 for (let l = 1; l <= 3; l++) { // Number of shapes in the card
-                    Cards[idCount - 1] = new Card(idCount, map[0][i], map[1][j], map[2][k], l, 0);
-                    Deck[idCount - 1] = new Card(idCount, map[0][i], map[1][j], map[2][k], l, 0);
-                    idCount++
+                    Cards[idCount - 1] = new Card(idCount, map[0][i], map[1][j], map[2][k], l, false);
+                    Deck[idCount - 1] = new Card(idCount, map[0][i], map[1][j], map[2][k], l, false);
+                    idCount++;
                 }
             }
         }
@@ -81,7 +83,7 @@ function shuffleDeck() {
     let curId = Deck.length;
 
     // The remaining elements to shuffle
-    while (0 !== curId) {
+    while (curId !== 0) {
         // Pick a remaining element
         let randId = Math.floor(Math.random() * curId);
         curId -= 1;
@@ -94,14 +96,14 @@ function shuffleDeck() {
 
 // Draw 3 cards to replace matched set and remove the cards from the deck
 function drawCards(num) {
-    let DrawnCards = [];
+    let drawnCards = [];
 
     for (let i = 1; i <= num; i++) {
-        DrawnCards.push(Deck[Deck.length - i]);
+        drawnCards.push(Deck[Deck.length - i]);
     }
     Deck.length = (Deck.length - num);
-    console.log("Drawn cards: " + JSON.stringify(DrawnCards));
-    return DrawnCards;
+    console.log("Drawn cards: " + JSON.stringify(drawnCards));
+    return drawnCards;
 }
 
 // Put 12 cards on the GameBoard
@@ -115,8 +117,8 @@ function updateBoardAfterSet(indexArr) {
 
     let drawnCards;
 
-    if (Deck.length >= 3) {
-        drawnCards = drawCards(3);
+    if (Deck.length >= CardsInSet) {
+        drawnCards = drawCards(CardsInSet);
         for (let i = 0; i < indexArr.length; i++) {
             GameBoard[indexArr[i]] = drawnCards[i];
         }
@@ -134,12 +136,12 @@ function updateBoardAfterSet(indexArr) {
             // If there aren't any cards left, if there are no sets on the board the game is over
         } else {
             if (setsOnBoard() === 0) {
-                finish_game();
-                return;
+                finishGame();
+            } else {
+                syncModelAndUIGameBoard();
             }
         }
     }
-    syncModelAndUIGameBoard();
 }
 
 // A set is defined as follows:
@@ -150,10 +152,10 @@ function isSet(x, y, z) {
         return false;
     } else {
         return (
-                (x.color === y.color && y.color === z.color) || (x.color !== y.color && x.color !== z.color && y.color !== z.color)) &&
-            ((x.shade === y.shade && y.shade === z.shade) || (x.shade !== y.shade && x.shade !== z.shade && y.shade !== z.shade)) &&
-            ((x.number === y.number && y.number === z.number) || (x.number !== y.number && x.number !== z.number && y.number !== z.number)) &&
-            ((x.shape === y.shape && y.shape === z.shape) || (x.shape !== y.shape && x.shape !== z.shape && y.shape !== z.shape)
+                x.color === y.color && y.color === z.color || x.color !== y.color && x.color !== z.color && y.color !== z.color) &&
+            (x.shade === y.shade && y.shade === z.shade || x.shade !== y.shade && x.shade !== z.shade && y.shade !== z.shade) &&
+            (x.number === y.number && y.number === z.number || x.number !== y.number && x.number !== z.number && y.number !== z.number) &&
+            (x.shape === y.shape && y.shape === z.shape || x.shape !== y.shape && x.shape !== z.shape && y.shape !== z.shape
             );
     }
 }
@@ -178,20 +180,20 @@ function setsOnBoard() {
 //Adds selected card into array. el is td element, with its child being the image
 function cardSelected(el) {
 
-    if (playerPlaying != null && el.firstChild.getAttribute("src") !== "images/82.png") {
+    if (playerPlaying !== null && el.firstChild.getAttribute("src") !== "") {
         highlight(el);
         let card = GameBoard[parseInt(el.id.replace('A', ''))];
         // Add or remove card from the potential set based on selection
-        if (card.selected === 0) {
-            card.selected = 1;
-            potentialSet.push(card);
-        } else {
-            card.selected = 0;
+        if (card.selected) {
+            card.selected = false;
             let a = potentialSet.indexOf(card);
             potentialSet.splice(a, 1);
+        } else {
+            card.selected = true;
+            potentialSet.push(card);
         }
         // If the potential set has size 3, do setChecking
-        if (potentialSet.length === 3) {
+        if (potentialSet.length === CardsInSet) {
             handleSetCheck();
         }
         console.log("Potential Set: " + JSON.stringify(potentialSet));
@@ -202,8 +204,8 @@ function cardSelected(el) {
  increment current player's score, else decrement. Update the score and change player to null */
 function handleSetCheck() {
 
-    for (let i = 0; i < 3; i++) {
-        potentialSet[i].selected = 0;
+    for (let i = 0; i < CardsInSet; i++) {
+        potentialSet[i].selected = false;
     }
 
     unHighlightAll();
@@ -217,5 +219,5 @@ function handleSetCheck() {
 
     potentialSet = [];
     scoreUpdate();
-    changePlayer(playerPlaying = null);
+    changePlayer(null);
 }

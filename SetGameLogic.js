@@ -27,24 +27,30 @@ const AttributeMapping = [
     ["Red", "Purple", "Green"], // 2. Color
 ];
 
-let GameBoard = []; // Holds the 12 visible cards
-let Cards = []; // Holds every card regardless of deck status
-let Deck = [];  // The deck of 81 cards
-let potentialSet = []; //Holds 3 cards that are user-inputted
+let GameBoard; // Holds the 12 visible cards
+let Cards; // Holds every card regardless of deck status
+let Deck;  // The deck of 81 cards
+let potentialSet; //Holds 3 cards that are user-inputted
 let scores; //Holds user score
-let playerPlaying = null; // Player currently selecting cards
+let playerPlaying; // Player currently selecting cards
+
+function initializeGlobals() {
+    GameBoard = []; // Holds the 12 visible cards
+    Cards = []; // Holds every card regardless of deck status
+    Deck = [];  // The deck of 81 cards
+    potentialSet = []; //Holds 3 cards that are user-inputted
+    playerPlaying = null; // Player currently selecting cards
+}
 
 // Do all the necessary initialization to start the Set game
 function startGame() {
+
     // re-initialize global variables as necessary
+    initializeGlobals();
 
     // Initialize cards and deck
-    if (Cards.length !== NumberOfCards || Deck.length !== NumberOfCards) {
-        console.log("Initializing cards");
-        initializeCards(AttributeMapping);
-    }
+    initializeCards(AttributeMapping);
     unHighlightAll();
-    changePlayer(playerPlaying);
     createGameBoard();
     let numPlayers = promptForPlayerNumber();
     scores = [];
@@ -57,8 +63,9 @@ function startGame() {
 
 function promptForPlayerNumber() {
     let numPlayers = null;
-    while (numPlayers === null) {
-        numPlayers = parseInt(prompt("Enter the number of players", "0"), 10);
+    while (numPlayers === null || numPlayers < 1 || numPlayers > 6) {
+        numPlayers = parseInt(prompt("Enter the number of players from 1-6, entering 1 will result in" +
+            "single player mode.", "1"), 10);
     }
     return numPlayers;
 }
@@ -106,9 +113,8 @@ function drawCards(num) {
     let drawnCards = [];
 
     for (let i = 1; i <= num; i++) {
-        drawnCards.push(Deck[Deck.length - i]);
+        drawnCards.push(Deck.pop());
     }
-    Deck.length = (Deck.length - num);
     console.log("Drawn cards: " + JSON.stringify(drawnCards));
     return drawnCards;
 }
@@ -119,36 +125,28 @@ function createGameBoard() {
     syncModelAndUIGameBoard();
 }
 
-// Replace the set with newly drawn cards
-function updateBoardAfterSet(indexArr) {
+// Replace the set with newly drawn cards, pass in the indexes on
+// the game board that need to be replaced with new cards
+function updateBoardAfterSet(gameBoardIndexesToReplace) {
 
-    let drawnCards;
-
-    if (Deck.length >= CardsInSet) {
-        drawnCards = drawCards(CardsInSet);
-        for (let i = 0; i < indexArr.length; i++) {
-            GameBoard[indexArr[i]] = drawnCards[i];
-        }
-    } else {
-        // Start by setting all cards to replace to null
-        for (let i = 0; i < indexArr.length; i++) {
-            GameBoard[indexArr[i]] = null;
-        }
-        // If there are cards left in the deck, replace however many we can
-        if (Deck.length > 0) {
-            drawnCards = drawCards(Deck.length);
-            for (let i = 0; i < drawnCards.length; i++) {
-                GameBoard[indexArr[i]] = drawnCards[i];
-            }
-            // If there aren't any cards left, if there are no sets on the board the game is over
-        } else {
-            if (setsOnBoard() === 0) {
-                finishGame();
-            } else {
-                syncModelAndUIGameBoard();
-            }
-        }
+    // If there aren't any cards left, if there are no sets on the board the game is over
+    if (Deck.length === 0) {
+        finishGame();
+        return
     }
+    // Start by setting all cards to replace to null
+    for (let i = 0; i < gameBoardIndexesToReplace.length; i++) {
+        GameBoard[gameBoardIndexesToReplace[i]] = null;
+    }
+    // Draw up to 3, but less if we don't have 3
+    let drawnCards = drawCards(Math.min(Deck.length, CardsInSet));
+
+    // Place them on the game board
+    for (let i = 0; i < drawnCards.length; i++) {
+        GameBoard[gameBoardIndexesToReplace[i]] = drawnCards[i];
+
+    }
+    syncModelAndUIGameBoard();
 }
 
 // A set is defined as follows:
@@ -157,9 +155,7 @@ function isSet(x, y, z) {
     // check to ensure non are null
     let set = true;
     if (x !== null && y !== null && z !== null) {
-        console.log(x.attributes)
         for (let key in x.attributes) {
-            console.log(key);
             if (!allAttributesEqual(x, y, z, key) && !allAttributesDifferent(x, y, z, key)) {
                 set = false;
             }
@@ -212,11 +208,11 @@ function cardSelected(el) {
             card.selected = true;
             potentialSet.push(card);
         }
+        console.log("Potential Set: " + JSON.stringify(potentialSet));
         // If the potential set has size 3, do setChecking
         if (potentialSet.length === CardsInSet) {
             handleSetCheck();
         }
-        console.log("Potential Set: " + JSON.stringify(potentialSet));
     }
 }
 
@@ -231,14 +227,20 @@ function handleSetCheck() {
     unHighlightAll();
 
     if (isSet(potentialSet[0], potentialSet[1], potentialSet[2])) {
+        console.log("Set found");
         scores[playerPlaying - 1]++;
         updateBoardAfterSet([GameBoard.indexOf(potentialSet[0]), GameBoard.indexOf(potentialSet[1]),
             GameBoard.indexOf(potentialSet[2])]);
     } else {
-        scores[playerPlaying - 1]--;
+        console.log("Not a set");
+        if (scores.length > 1) {
+            scores[playerPlaying - 1]--;
+        }
     }
 
     potentialSet = [];
     scoreUpdate();
-    playerPlaying = null;
+    if (scores.length > 1) {
+        playerPlaying = null;
+    }
 }

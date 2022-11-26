@@ -6,16 +6,20 @@ function initializeUI() {
     while (players.lastChild) {
         players.removeChild(players.lastChild);
     }
-    for (let i = 1; i <= scores.length; i++) {
-        let newLi = document.createElement("li");
-        newLi.className = "menu-item";
-        let a = document.createElement("a");
-        a.id = "p" + i.toString() + "score";
-        a.href = "#0";
-        a.setAttribute("onclick", "changePlayer(" + i.toString() + ");");
-        a.textContent = "Player " + i.toString() + ": ";
-        newLi.appendChild(a);
-        players.appendChild(newLi)
+    if (scores.length > 1) {
+        for (let i = 1; i <= scores.length; i++) {
+            let newLi = document.createElement("li");
+            newLi.className = "menu-item";
+            let a = document.createElement("a");
+            a.id = "p" + i.toString() + "score";
+            a.href = "#0";
+            a.setAttribute("onclick", "changePlayer(" + i.toString() + ");");
+            a.textContent = "Player " + i.toString() + ": ";
+            newLi.appendChild(a);
+            players.appendChild(newLi)
+        }
+    } else {
+        playerPlaying = 1;
     }
 }
 
@@ -64,19 +68,17 @@ function hintReveal() {
 
     // display message to redraw game board when there is no set on board
     if (setsOnBoard() === 0) {
-        const user_answer = window.confirm('There is no set on the board \n Ready to redraw the game board?');
-        if (user_answer) {
+        const userAnswer = window.confirm('There is no set on the board \n Ready to redraw the game board?');
+        if (userAnswer) {
             redrawGameBoard();
         }
     }
 }
 
-// Changes the player who is currently playing
+// Changes the player who is currently playing as long as another player isn't already selected
 function changePlayer(playerNumber) {
-    if (playerPlaying == null) { // Don't change player if a player has already been chosen
-        if (playerNumber != null) {
-            playerPlaying = playerNumber;
-        }
+    if (playerPlaying == null && playerNumber != null) {
+        playerPlaying = playerNumber;
     }
 }
 
@@ -119,18 +121,21 @@ function finishGame() {
             winningPlayers.push(i + 1);
         }
     }
-
-    if (winningPlayers.length === scores.length) {
-        alert("Game Over!\n All players draw with a score of " + maxScore);
-    } else if (winningPlayers.length > 1) {
-        let alertString = "Game Over!\n Players ";
-        for (let i = 1; i < winningPlayers.length; i++) {
-            alertString += i.toString() + ", ";
-        }
-        alertString += winningPlayers.length.toString() + " tie with the score: " + maxScore + "!";
-        alert(alertString);
+    if (scores.length == 1) {
+        alert("Game Over!\n You found " + maxScore + " sets!");
     } else {
-        alert("Game Over!\n Player " + winningPlayers[0] + " wins the game with the score: " + maxScore + "!");
+        if (winningPlayers.length === scores.length) {
+            alert("Game Over!\n All players draw with a score of " + maxScore);
+        } else if (winningPlayers.length > 1) {
+            let alertString = "Game Over!\n Players ";
+            for (let i = 1; i < winningPlayers.length; i++) {
+                alertString += i.toString() + ", ";
+            }
+            alertString += winningPlayers.length.toString() + " tie with the score: " + maxScore + "!";
+            alert(alertString);
+        } else {
+            alert("Game Over!\n Player " + winningPlayers[0] + " wins the game with the score: " + maxScore + "!");
+        }
     }
 
 }
